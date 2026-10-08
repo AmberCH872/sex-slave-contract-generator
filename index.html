@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>性奴认主协议生成器 | BDSM Contract Generator</title>
     
@@ -28,5 +28,15 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Fallback for GitHub Pages branch deployment serving unbundled root source
+      if (window.location.hostname.includes('github.io') && !window.location.pathname.includes('/dist/')) {
+        var hasDevScript = document.querySelector('script[src="/src/main.jsx"]');
+        if (hasDevScript) {
+          var target = window.location.pathname.replace(/\/+$/, '') + '/dist/' + window.location.search + window.location.hash;
+          window.location.replace(target);
+        }
+      }
+    </script>
   </body>
 </html>

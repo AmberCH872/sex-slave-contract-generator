@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import Home from './pages/Home'
 import Generator from './pages/Generator'
@@ -21,19 +21,19 @@ function App() {
         <nav className="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-md border-b border-gold-400/20">
           <div className="container-custom py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
                 <span className="text-3xl" style={{ color: '#ffd700' }}>Ω</span>
                 <h1 className="text-xl md:text-2xl font-display font-bold bg-gradient-to-r from-gold-400 to-yellow-500 
                             bg-clip-text text-transparent">
                   性奴认主协议生成器
                 </h1>
-              </div>
+              </Link>
               
               <div className="hidden md:flex items-center gap-6">
-                <a href="/" className="text-gray-300 hover:text-gold-400 transition-colors">首页</a>
-                <a href="/generator" className="text-gray-300 hover:text-gold-400 transition-colors">生成器</a>
-                <a href="/preview" className="text-gray-300 hover:text-gold-400 transition-colors">预览</a>
-                <a href="/settings" className="text-gray-300 hover:text-gold-400 transition-colors">设置</a>
+                <Link to="/" className="text-gray-300 hover:text-gold-400 transition-colors">首页</Link>
+                <Link to="/generator" className="text-gray-300 hover:text-gold-400 transition-colors">生成器</Link>
+                <Link to="/preview" className="text-gray-300 hover:text-gold-400 transition-colors">预览</Link>
+                <Link to="/settings" className="text-gray-300 hover:text-gold-400 transition-colors">设置</Link>
               </div>
             </div>
           </div>

@@ -121,33 +121,36 @@ export default function Home() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {dynamics.map((dynamic, index) => (
-            <motion.a
+            <motion.div
               key={index}
-              href={dynamic.path}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="card group"
             >
-              <div className="flex items-center justify-between mb-4">
-                <span className={`text-2xl ${index === 0 ? 'text-gold-400' : 'text-gray-400'}`}>
-                  {index === 0 ? '👑' : index === 1 ? '🐕' : index === 2 ? '⚡' : 
-                   index === 3 ? '📜' : index === 4 ? '💅' : '🏠'}
-                </span>
-                <div className="w-8 h-8 rounded-full bg-gold-400/20 flex items-center justify-center group-hover:bg-gold-400/30 transition-all">
-                  <svg className="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
+              <Link
+                to={dynamic.path}
+                className="card group block h-full"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <span className={`text-2xl ${index === 0 ? 'text-gold-400' : 'text-gray-400'}`}>
+                    {index === 0 ? '👑' : index === 1 ? '🐕' : index === 2 ? '⚡' : 
+                     index === 3 ? '📜' : index === 4 ? '💅' : '🏠'}
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-gold-400/20 flex items-center justify-center group-hover:bg-gold-400/30 transition-all">
+                    <svg className="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-              <h3 className="text-lg font-semibold mb-2 group-hover:text-gold-400 transition-colors">
-                {dynamic.name}
-              </h3>
-              <p className="text-gray-500 text-sm">
-                点击开始创建您的专属协议
-              </p>
-            </motion.a>
+                <h3 className="text-lg font-semibold mb-2 group-hover:text-gold-400 transition-colors">
+                  {dynamic.name}
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  点击开始创建您的专属协议
+                </p>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </section>
