@@ -1,0 +1,20 @@
+# Configuration for GitHub Pages
+baseurl: /sex-slave-contract-generator
+title: "性奴认主协议生成器 | BDSM Contract Generator"
+
+# Build settings
+build_type: static
+
+# Redirects (optional)
+redirects:
+  "/": "/"
+  "/generator": "/generator"
+  "/preview": "/preview"
+  "/settings": "/settings"
+
+# Custom headers (optional)
+headers:
+  /:
+    X-Content-Type-Options: "nosniff"
+    X-Frame-Options: "SAMEORIGIN"
+    X-XSS-Protection: "1; mode=block"
