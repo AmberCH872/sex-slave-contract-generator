@@ -1,393 +1,263 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { templates } from '../data/templates'
 
 export default function Settings() {
-  const [settings, setSettings] = useState({
-    theme: 'dark',
-    autoSave: true,
-    notifications: true,
-    printQuality: 'high',
-    showTemplates: true,
-    contractLanguage: 'zh-CN',
-    signatureStyle: 'handwritten',
-    includeDisclaimer: true,
-    enableWatermark: false
+  const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState('templates')
+  const [toastMessage, setToastMessage] = useState('')
+
+  const [settings, setSettings] = useState(() => {
+    const saved = localStorage.getItem('app_settings')
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch (e) {
+        // ignore
+      }
+    }
+    return {
+      autoSave: true,
+      includePreamble: true,
+      defaultDuration: '永久',
+      fontSize: 'medium'
+    }
   })
 
-  const [activeTab, setActiveTab] = useState('general')
+  const showToast = (msg) => {
+    setToastMessage(msg)
+    setTimeout(() => setToastMessage(''), 2500)
+  }
+
+  function handleSaveSettings() {
+    localStorage.setItem('app_settings', JSON.stringify(settings))
+    showToast('✅ 设置已保存至本地')
+  }
+
+  function handleClearAllLocalData() {
+    if (window.confirm('⚠️ 确定要清空所有本地保存的契约、草稿和历史设置吗？此操作无法撤销。')) {
+      localStorage.clear()
+      showToast('🗑️ 所有本地数据已安全清除')
+    }
+  }
 
   return (
-    <div className="min-h-screen pt-24 pb-12">
+    <div className="container-custom">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-gold-400 text-dark-900 font-bold px-4 py-2 rounded-full shadow-lg text-sm"
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
-      <div className="container-custom mb-8">
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4"
-        >
-          <span className="text-5xl">⚙️</span>
+      <div className="mb-6">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl sm:text-4xl p-2 rounded-xl bg-gold-400/10 border border-gold-400/20">
+            ⚙️
+          </span>
           <div>
-            <h1 className="text-3xl font-display font-bold text-white">
-              设置
+            <h1 className="text-2xl sm:text-3xl font-display font-bold text-white">
+              设置与数据管理
             </h1>
-            <p className="text-gray-400 mt-2">自定义您的协议生成体验</p>
+            <p className="text-xs sm:text-sm text-gray-400 mt-1">
+              管理模板库、偏好选项及本地隐私数据
+            </p>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Settings Tabs */}
-      <div className="container-custom mb-8">
-        <div className="flex gap-2 border-b border-gray-700 pb-2">
-          {['general', 'templates', 'appearance'].map((tab) => (
+      {/* Tabs */}
+      <div className="mb-6 border-b border-gray-700/80 -mx-3 px-3 sm:mx-0 sm:px-0">
+        <div className="flex gap-2 sm:gap-4 overflow-x-auto scrollbar-hide pb-2">
+          {[
+            { id: 'templates', label: '📜 模板管理' },
+            { id: 'general', label: '⚙️ 通用设置' },
+            { id: 'privacy', label: '🔒 隐私与清除' }
+          ].map(tab => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 font-medium transition-colors ${
-                activeTab === tab 
-                  ? 'text-gold-400 border-b-2 border-gold-400' 
-                  : 'text-gray-400 hover:text-white'
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'bg-gold-400/20 text-gold-400 border border-gold-400/40'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Settings Content */}
-      <div className="container-custom">
+      {/* Tab Contents */}
+      <div className="card p-4 sm:p-8">
         <AnimatePresence mode="wait">
-          {activeTab === 'general' && (
-            <motion.div
-              key="general"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className="text-xl font-semibold text-white mb-6">通用设置</h2>
-
-              <div className="space-y-6">
-                {/* Auto Save */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">自动保存</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      在编辑时自动保存进度，防止意外丢失
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSettings({ ...settings, autoSave: !settings.autoSave })}
-                    className={`w-12 h-6 rounded-full transition-colors ${
-                      settings.autoSave ? 'bg-gold-400' : 'bg-gray-600'
-                    }`}
-                  >
-                    <motion.div
-                      className="w-5 h-5 bg-white rounded-full absolute top-1"
-                      animate={{ x: settings.autoSave ? 24 : 1 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </button>
-                </div>
-
-                {/* Print Quality */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">打印质量</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      选择契约的打印清晰度
-                    </p>
-                  </div>
-                  <select
-                    value={settings.printQuality}
-                    onChange={(e) => setSettings({ ...settings, printQuality: e.target.value })}
-                    className="bg-dark-900 border border-gray-600 rounded-md px-4 py-2 text-white"
-                  >
-                    <option value="low">快速 (低质量)</option>
-                    <option value="medium">标准 (中等质量)</option>
-                    <option value="high">高清 (高质量)</option>
-                  </select>
-                </div>
-
-                {/* Signature Style */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">签名样式</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      选择签名的呈现方式
-                    </p>
-                  </div>
-                  <select
-                    value={settings.signatureStyle}
-                    onChange={(e) => setSettings({ ...settings, signatureStyle: e.target.value })}
-                    className="bg-dark-900 border border-gray-600 rounded-md px-4 py-2 text-white"
-                  >
-                    <option value="handwritten">手写风格</option>
-                    <option value="typed">打印字体</option>
-                    <option value="digital">电子签名</option>
-                  </select>
-                </div>
-
-                {/* Language */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">契约语言</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      选择协议的显示语言
-                    </p>
-                  </div>
-                  <select
-                    value={settings.contractLanguage}
-                    onChange={(e) => setSettings({ ...settings, contractLanguage: e.target.value })}
-                    className="bg-dark-900 border border-gray-600 rounded-md px-4 py-2 text-white"
-                  >
-                    <option value="zh-CN">简体中文</option>
-                    <option value="en-US">English</option>
-                    <option value="ja-JP">日本語</option>
-                  </select>
-                </div>
-
-                {/* Disclaimer */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">免责声明</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      在契约末尾显示标准免责声明
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSettings({ ...settings, includeDisclaimer: !settings.includeDisclaimer })}
-                    className={`w-12 h-6 rounded-full transition-colors ${
-                      settings.includeDisclaimer ? 'bg-gold-400' : 'bg-gray-600'
-                    }`}
-                  >
-                    <motion.div
-                      className="w-5 h-5 bg-white rounded-full absolute top-1"
-                      animate={{ x: settings.includeDisclaimer ? 24 : 1 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </button>
-                </div>
-
-                {/* Watermark */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">水印效果</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      在契约上显示 Ω 符号作为装饰性水印
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSettings({ ...settings, enableWatermark: !settings.enableWatermark })}
-                    className={`w-12 h-6 rounded-full transition-colors ${
-                      settings.enableWatermark ? 'bg-gold-400' : 'bg-gray-600'
-                    }`}
-                  >
-                    <motion.div
-                      className="w-5 h-5 bg-white rounded-full absolute top-1"
-                      animate={{ x: settings.enableWatermark ? 24 : 1 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Save Button */}
-              <div className="mt-8">
-                <button className="btn-primary">
-                  💾 保存设置
-                </button>
-              </div>
-            </motion.div>
-          )}
-
+          {/* Templates Tab */}
           {activeTab === 'templates' && (
             <motion.div
               key="templates"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-4"
             >
-              <h2 className="text-xl font-semibold text-white mb-6">模板设置</h2>
-
-              <div className="space-y-4">
-                {['basic-ds', 'pet-play', 'tpe', 'gorean-slave', 'femdom'].map((templateId) => (
-                  <div key={templateId} className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                    <div>
-                      <h3 className="text-white font-medium capitalize">
-                        {templateId === 'basic-ds' && '基本主奴契约'}
-                        {templateId === 'pet-play' && '宠玩协议 (Pet Play)'}
-                        {templateId === 'tpe' && '24/7 全权交换'}
-                        {templateId === 'gorean-slave' && '哥罗奴隶契约'}
-                        {templateId === 'femdom' && '女上位协议 (Femdom)'}
-                      </h3>
-                      <p className="text-gray-400 text-sm mt-1">
-                        默认模板：{templateId}
-                      </p>
-                    </div>
-                    <button className="btn-secondary px-6 py-2">
-                      编辑
-                    </button>
-                  </div>
-                ))}
-
-                {/* Add New Template */}
-                <div className="mt-4 p-4 bg-dark-900/50 rounded-lg border-2 border-dashed border-gray-600 hover:border-gold-400 transition-colors cursor-pointer">
-                  <h3 className="text-white font-medium mb-1">➕ 添加新模板</h3>
-                  <p className="text-gray-400 text-sm">创建自定义的协议模板</p>
+              <div className="flex items-center justify-between pb-3 border-b border-gray-700">
+                <div>
+                  <h2 className="text-base sm:text-lg font-semibold text-white">
+                    内置协议模板清单 ({templates.length})
+                  </h2>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    点击“起草”可直接跳转至生成器编辑对应模板
+                  </p>
                 </div>
               </div>
 
-              {/* Save Button */}
-              <div className="mt-8">
-                <button className="btn-primary">
-                  💾 保存模板设置
+              <div className="space-y-3">
+                {templates.map(tpl => (
+                  <div
+                    key={tpl.id}
+                    className="p-3 sm:p-4 rounded-xl bg-dark-900/60 border border-gray-700/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-gold-400/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl sm:text-3xl p-2 rounded-lg bg-dark-800">
+                        {tpl.icon}
+                      </span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm sm:text-base font-semibold text-white">
+                            {tpl.name}
+                          </h3>
+                          <span className="badge text-[10px]">{tpl.subtitle}</span>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1 line-clamp-1">
+                          {tpl.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 self-end sm:self-center">
+                      <button
+                        onClick={() => navigate(`/generator?type=${tpl.id}`)}
+                        className="btn-primary text-xs py-1.5 px-3.5"
+                      >
+                        ✍️ 前往起草
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {/* General Tab */}
+          {activeTab === 'general' && (
+            <motion.div
+              key="general"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6"
+            >
+              <h2 className="text-base sm:text-lg font-semibold text-white pb-3 border-b border-gray-700">
+                应用首选项
+              </h2>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-dark-900/50 border border-gray-700">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-medium text-white">
+                      自动保存草稿
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      在填写契约时自动保存至浏览器 localStorage，防止意外丢失
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.autoSave}
+                    onChange={(e) => setSettings({ ...settings, autoSave: e.target.checked })}
+                    className="w-5 h-5 accent-gold-400 rounded cursor-pointer"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-3 sm:p-4 rounded-lg bg-dark-900/50 border border-gray-700">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-medium text-white">
+                      包含序言誓词
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      在生成的契约文档顶部包含神圣立约誓约声明
+                    </p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.includePreamble}
+                    onChange={(e) => setSettings({ ...settings, includePreamble: e.target.checked })}
+                    className="w-5 h-5 accent-gold-400 rounded cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-end">
+                <button
+                  onClick={handleSaveSettings}
+                  className="btn-primary text-sm px-6 py-2.5"
+                >
+                  💾 保存偏好设置
                 </button>
               </div>
             </motion.div>
           )}
 
-          {activeTab === 'appearance' && (
+          {/* Privacy Tab */}
+          {activeTab === 'privacy' && (
             <motion.div
-              key="appearance"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
+              key="privacy"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6"
             >
-              <h2 className="text-xl font-semibold text-white mb-6">外观设置</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-white pb-3 border-b border-gray-700">
+                本地数据安全与隐私保护
+              </h2>
 
-              <div className="space-y-6">
-                {/* Theme */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">主题颜色</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      选择界面的主色调
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    {['gold', 'purple', 'blue'].map((color) => (
-                      <button
-                        key={color}
-                        onClick={() => setSettings({ ...settings, theme: color })}
-                        className={`w-8 h-8 rounded-full transition-transform hover:scale-110 ${
-                          settings.theme === color ? 'ring-2 ring-white' : ''
-                        }`}
-                        style={{
-                          background: color === 'gold' 
-                            ? 'linear-gradient(135deg, #ffd700 0%, #e6c200 100%)'
-                            : color === 'purple'
-                              ? 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)'
-                              : 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)'
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Font Size */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">字体大小</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      契约文本的显示大小
-                    </p>
-                  </div>
-                  <select
-                    value={settings.fontSize}
-                    onChange={(e) => setSettings({ ...settings, fontSize: e.target.value })}
-                    className="bg-dark-900 border border-gray-600 rounded-md px-4 py-2 text-white"
-                  >
-                    <option value="small">小 (10px)</option>
-                    <option value="medium">中 (12px)</option>
-                    <option value="large">大 (14px)</option>
-                    <option value="xlarge">超大 (16px)</option>
-                  </select>
-                </div>
-
-                {/* Line Spacing */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">行间距</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      文本的行距设置
-                    </p>
-                  </div>
-                  <select
-                    value={settings.lineSpacing}
-                    onChange={(e) => setSettings({ ...settings, lineSpacing: e.target.value })}
-                    className="bg-dark-900 border border-gray-600 rounded-md px-4 py-2 text-white"
-                  >
-                    <option value="tight">紧凑</option>
-                    <option value="normal">标准</option>
-                    <option value="loose">宽松</option>
-                  </select>
-                </div>
-
-                {/* Notifications */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">通知提示</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      保存和生成时显示提示
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSettings({ ...settings, notifications: !settings.notifications })}
-                    className={`w-12 h-6 rounded-full transition-colors ${
-                      settings.notifications ? 'bg-gold-400' : 'bg-gray-600'
-                    }`}
-                  >
-                    <motion.div
-                      className="w-5 h-5 bg-white rounded-full absolute top-1"
-                      animate={{ x: settings.notifications ? 24 : 1 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </button>
-                </div>
-
-                {/* Show Templates */}
-                <div className="flex items-center justify-between p-4 bg-dark-800/50 rounded-lg">
-                  <div>
-                    <h3 className="text-white font-medium">显示模板选择</h3>
-                    <p className="text-gray-400 text-sm mt-1">
-                      在生成页面显示快速模板切换
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSettings({ ...settings, showTemplates: !settings.showTemplates })}
-                    className={`w-12 h-6 rounded-full transition-colors ${
-                      settings.showTemplates ? 'bg-gold-400' : 'bg-gray-600'
-                    }`}
-                  >
-                    <motion.div
-                      className="w-5 h-5 bg-white rounded-full absolute top-1"
-                      animate={{ x: settings.showTemplates ? 24 : 1 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </button>
-                </div>
+              <div className="p-4 rounded-xl bg-gold-400/10 border border-gold-400/30 text-xs sm:text-sm text-gold-300 leading-relaxed space-y-2">
+                <p className="font-semibold text-gold-400">🔒 隐私承诺：</p>
+                <p>
+                  本契约生成器完全运行在客户端（您的浏览器内）。无论是主奴姓名、服从规则还是私密条款，任何数据均不会被上传至云端服务器或任何第三方接口。
+                </p>
               </div>
 
-              {/* Save Button */}
-              <div className="mt-8">
-                <button className="btn-primary">
-                  💾 保存外观设置
-                </button>
+              <div className="p-4 rounded-xl bg-dark-900/60 border border-red-500/30 space-y-3">
+                <h3 className="text-sm sm:text-base font-semibold text-red-400">
+                  一键清除所有本地缓存
+                </h3>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  若您在公共设备或他人设备上使用本工具，可在生成打印后点击下方按钮，彻底清除浏览器中的所有已保存契约、草稿与历史记录。
+                </p>
+                <div>
+                  <button
+                    onClick={handleClearAllLocalData}
+                    className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/50 font-semibold px-4 py-2 rounded-lg text-xs sm:text-sm transition-colors"
+                  >
+                    🗑️ 彻底清除所有本地数据
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-      {/* Footer */}
-      <footer className="container-custom py-8 border-t border-gold-400/20 text-center">
-        <p className="text-gray-500 text-sm">
-          所有设置仅保存在您的本地浏览器中
-        </p>
-      </footer>
     </div>
   )
 }

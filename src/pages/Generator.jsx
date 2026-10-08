@@ -1,903 +1,481 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-
-// Contract templates with shameful and erotic content
-const templates = [
-  {
-    id: 'basic-ds',
-    name: '基本主奴契约 (羞耻版)',
-    icon: '👑',
-    description: '基础的主奴权力交换协议 - 为奴从命，彻底下贱',
-    sections: [
-      {
-        title: '当事人信息',
-        fields: [
-          { label: '主人姓名 (Dominant)', type: 'text', required: true, placeholder: '请输入主人的全名' },
-          { label: '奴隶/臣服者姓名 (Submissive/Slave)', type: 'text', required: true, placeholder: '请输入您的全名' },
-          { label: '契约日期', type: 'date', required: true },
-          { label: '有效期限', type: 'select', options: ['永久', '1 年', '2 年', '3 年'], default: '永久' }
-        ]
-      },
-      {
-        title: '权力交换条款',
-        fields: [
-          { 
-            label: '权力移交声明', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述主人将哪些领域的控制权移交给奴隶...',
-            value: '我的身体、灵魂、尊严全部属于主人；我可以随时被主人使用；成为主人的私有物品；发出最淫荡的声音求饶...'
-          },
-          { 
-            label: '服从义务', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '列出奴隶需要遵守的指令和规则...',
-            value: '跪下，爬着走，舔脚，叫主人，求饶，发出淫荡的声音：\"主人好舒服...主人好喜欢...主人是我的神...请惩罚我...让我成为您的性奴吧...'
-          },
-          { 
-            label: '特权保留', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '说明主人保留的特权...',
-            value: '主人的身体完全属于我；我可以随意使用我的身体取悦主人；可以被主人随意鞭打、羞辱、调教；可以发出淫荡的声音求饶...'
-          }
-        ]
-      },
-      {
-        title: '日常协议',
-        fields: [
-          { 
-            label: '晨间仪式', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述每日开始的仪式...',
-            value: '每天醒来第一件事就是跪在地上，用舌头舔主人的脚底，发出娇媚的声音：\"主人早安...请允许我侍奉您...我的身体属于主人...请享用我吧...'
-          },
-          { 
-            label: '晚间汇报', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述每日结束时的汇报...',
-            value: '每天睡前必须跪在地上，用身体蹭主人的腿，发出淫荡的声音：\"主人...我今晚想被您玩弄...请让我成为您的性玩具...求您惩罚我...'
-          },
-          { 
-            label: '沟通规则', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定双方的沟通方式...',
-            value: '每次沟通必须跪着，用娇媚的声音称呼主人；必须发出淫荡的求饶声；必须描述自己如何想被主人玩弄...'
-          }
-        ]
-      },
-      {
-        title: '惩罚与奖励',
-        fields: [
-          { 
-            label: '惩罚方式', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述可执行的惩罚...',
-            value: '跪在地上接受鞭打；用舌头舔主人的伤口；发出淫荡的声音求饶；爬着走到主人面前求饶...'
-          },
-          { 
-            label: '奖励机制', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述对良好服从的奖励...',
-            value: '被主人亲吻；用身体蹭主人的腿；发出淫荡的声音赞美主人；成为主人的性玩具...'
-          }
-        ]
-      },
-      {
-        title: '终止条款',
-        fields: [
-          { 
-            label: '解除条件', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '说明契约的解除...',
-            value: '除非主人同意，否则奴隶永远不能离开；只有主人想解放时才可能解除；解除时必须跪在地上发出淫荡的声音...'
-          },
-          { 
-            label: '争议解决', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定发生分歧的处理...',
-            value: '奴隶必须跪在地上求饶；主人可以随意惩罚；争议由主人决定；奴隶必须服从主人的所有决定...'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'pet-play',
-    name: '宠玩协议 (淫荡版)',
-    icon: '🐕',
-    description: '主人/宠物动态的专属契约 - 为奴为宠，彻底下贱',
-    sections: [
-      {
-        title: '当事人信息',
-        fields: [
-          { label: '主人姓名 (Owner)', type: 'text', required: true, placeholder: '请输入主人的全名' },
-          { label: '宠物姓名 (Pet/Kajira)', type: 'text', required: true, placeholder: '请输入宠物的名字/代号' },
-          { label: '物种设定', type: 'select', options: ['猫系', '犬系', '兔系', '其他'], default: '其他' },
-          { label: '契约日期', type: 'date', required: true }
-        ]
-      },
-      {
-        title: '宠物条款',
-        fields: [
-          { 
-            label: '宠物空间定义', 
-            type: 'textarea', 
-            placeholder: '描述宠物的专属空间和活动范围...',
-            value: '我的专属空间是主人的卧室；我必须跪在地上接受检查；成为主人的私有物品...'
-          },
-          { 
-            label: '服从指令', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '列出需要遵守的淫荡指令...',
-            value: '跪着，爬着走，舔脚，叫主人，求饶，发出淫荡的声音，用身体蹭主人的腿...'
-          },
-          { 
-            label: '装备使用', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定使用的宠物装备...',
-            value: '戴上项圈，脖子上挂着铃铛；用链子拴住；被主人随意摆布；成为主人的私有财产...'
-          }
-        ]
-      },
-      {
-        title: '饮食与护理',
-        fields: [
-          { 
-            label: '喂食规定', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述喂食的规定...',
-            value: '必须跪着接受喂食；用舌头舔主人的手；发出淫荡的声音求食；成为主人的口粮...'
-          },
-          { 
-            label: '清洁要求', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定清洁的要求...',
-            value: '必须跪在地上接受清洁；用舌头舔主人的脚；发出淫荡的声音赞美主人；成为主人的私有物品...'
-          }
-        ]
-      },
-      {
-        title: '游戏与训练',
-        fields: [
-          { 
-            label: '游戏时间', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定游戏的时间和方式...',
-            value: '被主人随意玩弄；发出淫荡的声音求饶；爬着走到主人面前；成为主人的性玩具...'
-          },
-          { 
-            label: '训练目标', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述训练的目标...',
-            value: '学会发出最淫荡的声音；学会用最骚的方式取悦主人；成为主人的私有财产；完全服从主人的命令...'
-          }
-        ]
-      },
-      {
-        title: '解除条款',
-        fields: [
-          { 
-            label: '解宠条件', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '说明何时可以解除...',
-            value: '除非主人同意，否则永远不能解除；只有主人想解放时才可能；解除时必须跪在地上发出最淫荡的声音...'
-          },
-          { 
-            label: '告别仪式', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定结束时的告别...',
-            value: '跪在地上，用身体蹭主人的腿；发出最淫荡的声音求饶；成为主人的私有财产直到最后一刻...'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'tpe',
-    name: '24/7 全权交换 (下贱版)',
-    icon: '⚡',
-    description: '全天候权力完全转移的严格协议 - 彻底为奴，毫无尊严',
-    sections: [
-      {
-        title: '当事人信息',
-        fields: [
-          { label: '主人姓名 (Master)', type: 'text', required: true, placeholder: '请输入主人的全名' },
-          { label: '奴隶/臣服者姓名 (Slave/Kajira)', type: 'text', required: true, placeholder: '请输入您的全名' },
-          { label: '契约日期', type: 'date', required: true },
-          { label: '有效期限', type: 'select', options: ['永久', '1 年', '2 年', '3 年'], default: '永久' }
-        ]
-      },
-      {
-        title: '完全权力移交声明',
-        fields: [
-          { 
-            label: '生活领域移交', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述哪些生活领域完全由主人控制...',
-            value: '饮食必须由主人决定；作息必须听从主人的安排；社交活动由主人批准；成为主人的私有物品...'
-          },
-          { 
-            label: '财产所有权', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定个人财产的归属...',
-            value: '所有财产归主人所有；必须跪着向主人汇报财产状况；成为主人的私有物品；随时可以被没收...'
-          },
-          { 
-            label: '身体控制权', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述身体支配权...',
-            value: '身体的每一个部位都属于主人；可以随意使用我的身体取悦主人；成为主人的性玩具；完全服从主人的命令...'
-          }
-        ]
-      },
-      {
-        title: '日常服从协议',
-        fields: [
-          { 
-            label: '24 小时监控', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定主人对奴隶的监控...',
-            value: '必须随时向主人汇报行踪；必须跪着接受主人的检查；发出淫荡的声音求饶；成为主人的私有物品...'
-          },
-          { 
-            label: '指令执行', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述对所有指令的执行...',
-            value: '所有指令必须立即执行；跪着接受命令；发出淫荡的声音求饶；成为主人的私有物品...'
-          },
-          { 
-            label: '自主权限制', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '说明奴隶被剥夺的权利...',
-            value: '没有自主决策权；必须完全服从主人的命令；成为主人的私有物品；随时可以被抛弃...'
-          }
-        ]
-      },
-      {
-        title: '惩罚与服从测试',
-        fields: [
-          { 
-            label: '日常惩罚', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述常规惩罚...',
-            value: '跪在地上接受鞭打；用舌头舔主人的伤口；发出淫荡的声音求饶；爬着走到主人面前...'
-          },
-          { 
-            label: '服从测试', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定定期进行的服从测试...',
-            value: '跪在地上接受主人的检查；发出最淫荡的声音；爬着走到主人面前求饶；成为主人的私有物品...'
-          }
-        ]
-      },
-      {
-        title: '解除条款',
-        fields: [
-          { 
-            label: '永久解除条件', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '说明永久解除的条件...',
-            value: '除非主人同意，否则永远不能解除；只有主人想解放时才可能；解除时必须跪在地上发出最淫荡的声音...'
-          },
-          { 
-            label: '过渡期安排', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定解除后的安排...',
-            value: '在过渡期内继续跪在地上；发出淫荡的声音求饶；成为主人的私有物品直到最后一刻...'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'gorean-slave',
-    name: '哥罗奴隶契约 (淫荡版)',
-    icon: '📜',
-    description: '基于哥罗哲学的正式主奴协议 - 为奴为宠，彻底下贱',
-    sections: [
-      {
-        title: '当事人信息',
-        fields: [
-          { label: '主人姓名 (Master)', type: 'text', required: true, placeholder: '请输入主人的全名' },
-          { label: '奴隶/卡吉拉姓名 (Slave/Kajira)', type: 'text', required: true, placeholder: '请输入您的全名' },
-          { label: '部落归属', type: 'select', options: ['自由民', '半奴', '完全奴'], default: '完全奴' },
-          { label: '契约日期', type: 'date', required: true }
-        ]
-      },
-      {
-        title: '哥罗原则声明',
-        fields: [
-          { 
-            label: '自然秩序确认', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '确认接受哥罗的自然等级制度...',
-            value: '我承认主人的地位高于一切；我的存在是为了取悦主人；成为主人的私有物品；发出最淫荡的声音求饶...'
-          },
-          { 
-            label: '性别角色认同', 
-            type: 'textarea', 
-            placeholder: '描述对传统性别角色的认同...',
-            value: '我完全接受作为奴隶的角色；我的身体是主人的财产；成为主人的性玩具；发出最淫荡的声音求饶...'
-          },
-          { 
-            label: '种族/物种观念', 
-            type: 'textarea', 
-            placeholder: '表达对不同种族/物种的等级认知...',
-            value: '我承认自己的低等地位；我的存在是为了取悦主人；成为主人的私有物品；发出最淫荡的声音求饶...'
-          }
-        ]
-      },
-      {
-        title: '奴隶义务条款',
-        fields: [
-          { 
-            label: '忠诚誓言', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '对主人的绝对忠诚...',
-            value: '我永远属于主人；我的身体是主人的私有财产；我会用尽一切方式取悦主人；成为主人的性奴直到死亡...'
-          },
-          { 
-            label: '服从范围', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述服从的范围...',
-            value: '身体的每一个部位都属于主人；必须跪着接受主人的命令；发出淫荡的声音求饶；成为主人的私有物品...'
-          },
-          { 
-            label: '身体从属', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定身体支配的方式...',
-            value: '身体的每一个部位都可以被主人使用；成为主人的性玩具；发出最淫荡的声音求饶；完全服从主人的命令...'
-          }
-        ]
-      },
-      {
-        title: '主人特权',
-        fields: [
-          { 
-            label: '惩罚权', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述主人的惩罚权...',
-            value: '可以随意鞭打我的身体；可以随意使用我的身体取悦自己；可以把我变成最下贱的性奴；成为主人的私有物品...'
-          },
-          { 
-            label: '财产所有权', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '确认奴隶财产的归属...',
-            value: '所有财产归主人所有；必须跪着向主人汇报；成为主人的私有物品；随时可以被没收...'
-          }
-        ]
-      },
-      {
-        title: '解放条款',
-        fields: [
-          { 
-            label: '解放条件', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '说明奴隶获得自由...',
-            value: '除非主人同意，否则永远不能获得自由；只有主人想解放时才可能；解放时必须跪在地上发出最淫荡的声音...'
-          },
-          { 
-            label: '解放仪式', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定解放时的仪式...',
-            value: '跪在地上，用身体蹭主人的腿；发出最淫荡的声音求饶；成为主人的私有财产直到最后一刻...'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'femdom',
-    name: '女上位协议 (骚版)',
-    icon: '💅',
-    description: '女性主导的权力交换契约 - 为奴为宠，彻底下贱',
-    sections: [
-      {
-        title: '当事人信息',
-        fields: [
-          { label: '主人姓名 (Female Dom)', type: 'text', required: true, placeholder: '请输入主人的全名' },
-          { label: '臣服者姓名 (Submissive)', type: 'text', required: true, placeholder: '请输入您的全名' },
-          { label: '契约日期', type: 'date', required: true }
-        ]
-      },
-      {
-        title: '女上位原则',
-        fields: [
-          { 
-            label: '女性权威确认', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '确认接受女性在关系中的主导地位...',
-            value: '我完全接受女性的主导地位；我的存在是为了取悦主人；成为主人的私有物品；发出最淫荡的声音求饶...'
-          },
-          { 
-            label: '崇拜义务', 
-            type: 'textarea', 
-            placeholder: '描述对主人的崇拜和赞美要求...',
-            value: '必须跪在地上崇拜主人；用身体蹭主人的腿；发出最淫荡的声音赞美主人；成为主人的私有物品...'
-          },
-          { 
-            label: '服务职责', 
-            type: 'textarea', 
-            placeholder: '列出需要履行的服务性职责...',
-            value: '必须跪着服侍主人；用舌头舔主人的脚；发出淫荡的声音求饶；成为主人的私有物品...'
-          }
-        ]
-      },
-      {
-        title: '性行为协议',
-        fields: [
-          { 
-            label: '性权利归属', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述性行为控制...',
-            value: '我的身体完全属于主人；可以随意使用我的身体取悦主人；成为主人的性玩具；发出最淫荡的声音求饶...'
-          },
-          { 
-            label: '性玩具使用', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定性玩具的使用...',
-            value: '可以随意使用我的身体作为性玩具；发出最淫荡的声音求饶；成为主人的私有物品；完全服从主人的命令...'
-          },
-          { 
-            label: ' chastity 控制 (可选)', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '关于锁链/手铐的约定...',
-            value: '可以随意使用锁链和手铐；成为主人的私有物品；发出最淫荡的声音求饶；完全服从主人的命令...'
-          }
-        ]
-      },
-      {
-        title: '日常服从',
-        fields: [
-          { 
-            label: '家务服务', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定的家务劳动...',
-            value: '必须跪着做家务；用身体蹭主人的腿；发出淫荡的声音赞美主人；成为主人的私有物品...'
-          },
-          { 
-            label: '情感服务', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述需要的陪伴...',
-            value: '必须跪在地上陪伴主人；发出最淫荡的声音求饶；成为主人的私有物品；完全服从主人的命令...'
-          }
-        ]
-      },
-      {
-        title: '解除条款',
-        fields: [
-          { 
-            label: '关系终止条件', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '说明关系终止的条件...',
-            value: '除非主人同意，否则永远不能结束；只有主人想解放时才可能；终止时必须跪在地上发出最淫荡的声音...'
-          },
-          { 
-            label: '后戏安排', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定关系结束时的处理...',
-            value: '跪在地上，用身体蹭主人的腿；发出最淫荡的声音求饶；成为主人的私有物品直到最后一刻...'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'pet-play-2',
-    name: '宠物饲养协议 (下贱版)',
-    icon: '🏠',
-    description: '家庭宠物式的主奴动态契约 - 为奴为宠，彻底下贱',
-    sections: [
-      {
-        title: '当事人信息',
-        fields: [
-          { label: '主人姓名 (Owner)', type: 'text', required: true, placeholder: '请输入主人的全名' },
-          { label: '宠物/臣服者姓名 (Pet/Sub)', type: 'text', required: true, placeholder: '请输入宠物的名字' },
-          { label: '契约日期', type: 'date', required: true }
-        ]
-      },
-      {
-        title: '家庭宠物条款',
-        fields: [
-          { 
-            label: '宠物空间', 
-            type: 'textarea', 
-            placeholder: '描述宠物的专属区域和活动时间...',
-            value: '我的专属区域是主人的卧室；我必须跪在地上接受检查；成为主人的私有物品...'
-          },
-          { 
-            label: '服从指令', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '列出基本服从的淫荡指令...',
-            value: '跪着，爬着走，舔脚，叫主人，求饶，发出淫荡的声音，用身体蹭主人的腿...'
-          },
-          { 
-            label: '称呼约定', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定主人对宠物的称呼...',
-            value: '必须跪着被主人称为\"小贱人\"；发出最淫荡的声音求饶；成为主人的私有物品；完全服从主人的命令...'
-          }
-        ]
-      },
-      {
-        title: '饮食与照顾',
-        fields: [
-          { 
-            label: '喂食规定', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述喂食的规定...',
-            value: '必须跪着接受喂食；用舌头舔主人的手；发出淫荡的声音求食；成为主人的口粮...'
-          },
-          { 
-            label: '清洁要求', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定日常清洁的要求...',
-            value: '必须跪在地上接受清洁；用舌头舔主人的脚；发出淫荡的声音赞美主人；成为主人的私有物品...'
-          }
-        ]
-      },
-      {
-        title: '游戏互动',
-        fields: [
-          { 
-            label: '玩耍时间', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定的游戏时间...',
-            value: '被主人随意玩弄；发出淫荡的声音求饶；爬着走到主人面前；成为主人的性玩具...'
-          },
-          { 
-            label: '训练目标', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '描述训练的目标...',
-            value: '学会发出最淫荡的声音；学会用最骚的方式取悦主人；成为主人的私有财产；完全服从主人的命令...'
-          }
-        ]
-      },
-      {
-        title: '解除条款',
-        fields: [
-          { 
-            label: '解宠条件', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '说明何时可以解除...',
-            value: '除非主人同意，否则永远不能解除；只有主人想解放时才可能；解除时必须跪在地上发出最淫荡的声音...'
-          },
-          { 
-            label: '告别仪式', 
-            type: 'textarea', 
-            required: true, 
-            placeholder: '约定结束时的告别...',
-            value: '跪在地上，用身体蹭主人的腿；发出最淫荡的声音求饶；成为主人的私有财产直到最后一刻...'
-          }
-        ]
-      }
-    ]
-  }
-]
+import { templates, getTemplateById } from '../data/templates'
 
 export default function Generator() {
-  const { type } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
   
-  // Find template by ID or show home if no type specified
-  const templateId = type || 'basic-ds'
-  const selectedTemplate = templates.find(t => t.id === templateId) || templates[0]
+  // Read template from query param ?type=...
+  const templateId = searchParams.get('type') || 'basic-ds'
+  const selectedTemplate = getTemplateById(templateId)
   
   // State for form data
   const [formData, setFormData] = useState({})
   const [activeSectionIndex, setActiveSectionIndex] = useState(0)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [viewMode, setViewMode] = useState('stepper') // 'stepper' or 'all'
+  const [toastMessage, setToastMessage] = useState('')
 
-  // Initialize form data with template structure
+  // Show temporary toast message
+  const showToast = (msg) => {
+    setToastMessage(msg)
+    setTimeout(() => setToastMessage(''), 2500)
+  }
+
+  // Initialize or reload form when template changes
   useEffect(() => {
     initializeForm(selectedTemplate)
-  }, [selectedTemplate])
+    setActiveSectionIndex(0)
+  }, [selectedTemplate.id])
 
-  function initializeForm(template) {
-    const initialData = {}
-    
-    template.sections.forEach((section, sectionIndex) => {
-      initialData[`section_${sectionIndex}`] = {
-        title: section.title,
-        fields: []
+  // Initialize form data with default template content or local draft
+  function initializeForm(template, forceReset = false) {
+    if (!forceReset) {
+      const savedDraft = localStorage.getItem(`draft_${template.id}`)
+      if (savedDraft) {
+        try {
+          const parsed = JSON.parse(savedDraft)
+          if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+            setFormData(parsed)
+            return
+          }
+        } catch (e) {
+          // ignore parsing error
+        }
       }
-      
+    }
+
+    const initialData = {}
+    template.sections.forEach((section, sIdx) => {
       section.fields.forEach(field => {
+        const key = `section_${sIdx}_${field.label}`
         if (field.type === 'date') {
-          const date = new Date().toISOString().split('T')[0]
-          initialData[`section_${sectionIndex}_${field.label}`] = date
-        } else if (field.type === 'select' && field.options) {
-          initialData[`section_${sectionIndex}_${field.label}`] = field.default || ''
-        } else if (field.required) {
-          initialData[`section_${sectionIndex}_${field.label}`] = ''
+          initialData[key] = new Date().toISOString().split('T')[0]
+        } else if (field.type === 'select') {
+          initialData[key] = field.default || (field.options ? field.options[0] : '')
         } else {
-          // If value is provided, use it; otherwise empty string
-          const value = formData[`section_${sectionIndex}_${field.label}`] || field.value || ''
-          initialData[`section_${sectionIndex}_${field.label}`] = value
+          // Pre-fill with rich template default content!
+          initialData[key] = field.value !== undefined ? field.value : ''
         }
       })
     })
-    
+
     setFormData(initialData)
-  }
-
-  function handleFieldChange(sectionIndex, fieldName, value) {
-    const sectionKey = `section_${sectionIndex}`
-    const newFormData = { ...formData }
-    
-    // If field is an array (like fields), update the array
-    if (fieldName === 'fields') {
-      newFormData[sectionKey] = {
-        title: formData[sectionKey]?.title || '',
-        fields: value
-      }
-    } else {
-      // Update individual field value
-      newFormData[sectionKey] = {
-        ...formData[sectionKey],
-        [fieldName]: value
-      }
+    if (forceReset) {
+      localStorage.removeItem(`draft_${template.id}`)
+      showToast('已恢复预设契约条款')
     }
-    
-    setFormData(newFormData)
   }
 
-  function handleSectionChange(sectionIndex, key, value) {
-    const newFormData = { ...formData }
-    newFormData[`section_${sectionIndex}`] = {
-      title: value,
-      fields: formData[`section_${sectionIndex}`]?.fields || []
+  // Handle individual input changes
+  function handleFieldChange(sectionIndex, fieldLabel, value) {
+    const key = `section_${sectionIndex}_${fieldLabel}`
+    setFormData(prev => {
+      const updated = { ...prev, [key]: value }
+      localStorage.setItem(`draft_${selectedTemplate.id}`, JSON.stringify(updated))
+      return updated
+    })
+  }
+
+  // Quick switch template
+  function handleSelectTemplate(newId) {
+    if (newId === selectedTemplate.id) return
+    setSearchParams({ type: newId })
+  }
+
+  // Clear all fields
+  function handleClearFields() {
+    if (window.confirm('确定要清空当前所有内容吗？您可以随时点击“恢复预设”重新加载模板。')) {
+      const emptyData = {}
+      selectedTemplate.sections.forEach((section, sIdx) => {
+        section.fields.forEach(field => {
+          const key = `section_${sIdx}_${field.label}`
+          emptyData[key] = ''
+        })
+      })
+      setFormData(emptyData)
+      localStorage.setItem(`draft_${selectedTemplate.id}`, JSON.stringify(emptyData))
+      showToast('已清空当前表单')
     }
-    setFormData(newFormData)
   }
 
+  // Generate Contract and Navigate to Preview
   function generateContract() {
     setIsGenerating(true)
-    
-    // Simulate generation process
+
+    // Build complete structured contract object
+    const contractData = {
+      id: selectedTemplate.id,
+      name: selectedTemplate.name,
+      subtitle: selectedTemplate.subtitle || '',
+      icon: selectedTemplate.icon,
+      date: formData[`section_0_契约生效日期`] || formData[`section_0_契约日期`] || new Date().toISOString().split('T')[0],
+      parties: {
+        dominant: formData[`section_0_${selectedTemplate.sections[0].fields[0]?.label}`] || '支配方',
+        submissive: formData[`section_0_${selectedTemplate.sections[0].fields[1]?.label}`] || '臣服方',
+        duration: formData[`section_0_有效期限`] || formData[`section_0_契约期限`] || '永久'
+      },
+      sections: selectedTemplate.sections.map((section, sIdx) => ({
+        title: section.title,
+        fields: section.fields.map(field => ({
+          label: field.label,
+          type: field.type,
+          value: formData[`section_${sIdx}_${field.label}`] !== undefined 
+            ? formData[`section_${sIdx}_${field.label}`] 
+            : (field.value || '')
+        }))
+      }))
+    }
+
+    // Save to localStorage for Preview page
+    localStorage.setItem('generated_contract', JSON.stringify(contractData))
+
     setTimeout(() => {
-      navigate('/preview')
       setIsGenerating(false)
-    }, 1500)
+      navigate('/preview')
+    }, 600)
   }
 
+  const currentSection = selectedTemplate.sections[activeSectionIndex] || selectedTemplate.sections[0]
+  const isLastSection = activeSectionIndex === selectedTemplate.sections.length - 1
+
   return (
-    <div className="min-h-screen pt-24 pb-12">
-      {/* Header */}
-      <div className="container-custom mb-8">
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4"
-        >
-          <span className="text-5xl">{selectedTemplate.icon}</span>
-          <div>
-            <h1 className="text-3xl font-display font-bold text-white">
-              {selectedTemplate.name}
-            </h1>
-            <p className="text-gray-400 mt-2">{selectedTemplate.description}</p>
-          </div>
-        </motion.div>
-      </div>
+    <div className="container-custom">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-gold-400 text-dark-900 font-semibold px-4 py-2 rounded-full shadow-lg text-sm"
+          >
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Template Selector (for quick navigation) */}
-      <div className="container-custom mb-8">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {templates.map((t, index) => (
-            <button
-              key={index}
-              onClick={() => navigate(`/generator?type=${t.id}`)}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
-                t.id === templateId 
-                  ? 'bg-gold-400 text-white' 
-                  : 'bg-dark-800 text-gray-400 hover:bg-dark-700'
-              }`}
-            >
-              <span>{t.icon}</span>
-              <span className="text-sm">{t.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Form */}
-      <div className="container-custom">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="contract-paper"
-        >
-          {/* Progress Indicator */}
-          <div className="mb-8">
-            <div className="flex justify-between mb-2">
-              {selectedTemplate.sections.map((_, index) => (
-                <div 
-                  key={index}
-                  className={`h-1 flex-1 mx-1 rounded-full transition-all ${
-                    activeSectionIndex === index ? 'bg-gold-400' : 
-                    activeSectionIndex > index ? 'bg-gold-400/50' : 'bg-gray-600'
-                  }`}
-                />
-              ))}
+      {/* Header with Title & Quick Info */}
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <span className="text-4xl sm:text-5xl p-2.5 rounded-2xl bg-gold-400/10 border border-gold-400/20">
+              {selectedTemplate.icon}
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl sm:text-3xl font-display font-bold text-white">
+                  {selectedTemplate.name}
+                </h1>
+                <span className="badge hidden sm:inline-block">
+                  {selectedTemplate.subtitle}
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-400 mt-1 line-clamp-2">
+                {selectedTemplate.description}
+              </p>
             </div>
           </div>
 
-          {/* Form Sections */}
-          {selectedTemplate.sections.map((section, sectionIndex) => (
-            <motion.div
-              key={sectionIndex}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: sectionIndex * 0.1 }}
-              className="contract-section"
+          {/* Action buttons */}
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              onClick={() => initializeForm(selectedTemplate, true)}
+              className="btn-ghost text-xs sm:text-sm"
+              title="重置为模板预设内容"
             >
-              <div className="contract-header">
-                <h3 className="text-2xl font-serif font-bold text-gold-400 mb-2">
-                  {section.title}
-                </h3>
-              </div>
+              🔄 恢复预设
+            </button>
+            <button
+              onClick={handleClearFields}
+              className="btn-ghost text-xs sm:text-sm text-gray-400 hover:text-red-400"
+              title="清空以便自定义输入"
+            >
+              🗑️ 清空
+            </button>
+          </div>
+        </div>
+      </div>
 
-              {/* Section Fields */}
-              <div className="space-y-6">
-                {section.fields.map((field, fieldIndex) => (
-                  <motion.div
-                    key={fieldIndex}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: sectionIndex * 0.1 + fieldIndex * 0.05 }}
-                    className="form-group"
-                  >
+      {/* Template Carousel Selector (Horizontal Touch Scrolling on Mobile) */}
+      <div className="mb-6 -mx-3 px-3 sm:mx-0 sm:px-0">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+          {templates.map((t) => {
+            const isSelected = t.id === selectedTemplate.id
+            return (
+              <button
+                key={t.id}
+                onClick={() => handleSelectTemplate(t.id)}
+                className={`flex-shrink-0 snap-start px-3.5 py-2.5 rounded-xl flex items-center gap-2 text-xs sm:text-sm transition-all duration-200 border ${
+                  isSelected
+                    ? 'bg-gradient-to-r from-gold-500 to-yellow-600 text-dark-900 font-bold border-gold-400 shadow-md shadow-gold-400/20 scale-[1.02]'
+                    : 'bg-dark-800/80 text-gray-300 hover:text-white border-gray-700/80 hover:border-gold-400/40'
+                }`}
+              >
+                <span className="text-lg">{t.icon}</span>
+                <span className="whitespace-nowrap">{t.name}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* View Mode Toggle & Progress Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400 font-medium">
+          <span>当前填写：</span>
+          <span className="text-gold-400 font-bold">
+            第 {activeSectionIndex + 1} / {selectedTemplate.sections.length} 节
+          </span>
+          <span className="hidden sm:inline text-gray-500">· {currentSection.title}</span>
+        </div>
+
+        {/* Stepper vs All Toggle */}
+        <div className="bg-dark-900/90 border border-gray-700 rounded-lg p-0.5 flex text-xs">
+          <button
+            onClick={() => setViewMode('stepper')}
+            className={`px-3 py-1 rounded-md transition-colors ${
+              viewMode === 'stepper' ? 'bg-gold-400/20 text-gold-400 font-semibold' : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            分步填写
+          </button>
+          <button
+            onClick={() => setViewMode('all')}
+            className={`px-3 py-1 rounded-md transition-colors ${
+              viewMode === 'all' ? 'bg-gold-400/20 text-gold-400 font-semibold' : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            全文展示
+          </button>
+        </div>
+      </div>
+
+      {/* Stepper Tabs Bar (Clickable Jump on Mobile & Desktop) */}
+      <div className="grid grid-cols-5 gap-1.5 sm:gap-2 mb-6">
+        {selectedTemplate.sections.map((section, idx) => {
+          const isActive = activeSectionIndex === idx
+          const isDone = activeSectionIndex > idx
+          return (
+            <button
+              key={idx}
+              onClick={() => setActiveSectionIndex(idx)}
+              className={`p-2 sm:p-3 rounded-lg text-left transition-all border ${
+                isActive
+                  ? 'bg-gold-400/15 border-gold-400 text-gold-400 ring-1 ring-gold-400/30'
+                  : isDone
+                  ? 'bg-dark-800/80 border-gray-700 text-gray-300'
+                  : 'bg-dark-800/40 border-gray-800 text-gray-500 hover:border-gray-700'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 text-[10px] sm:text-xs">
+                <span className={`w-4 h-4 rounded-full flex items-center justify-center font-bold text-[9px] ${
+                  isActive ? 'bg-gold-400 text-dark-900' : isDone ? 'bg-gold-400/30 text-gold-300' : 'bg-gray-700 text-gray-400'
+                }`}>
+                  {isDone ? '✓' : idx + 1}
+                </span>
+                <span className="font-semibold truncate hidden md:inline">
+                  {section.title}
+                </span>
+              </div>
+              <div className="text-[11px] font-medium truncate mt-1 text-gray-300 md:hidden">
+                {section.title.split(' ')[0]}
+              </div>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Main Form Content */}
+      <div className="contract-paper relative">
+        {viewMode === 'stepper' ? (
+          /* STEP-BY-STEP VIEW (Focused & Clean) */
+          <motion.div
+            key={activeSectionIndex}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.25 }}
+            className="space-y-6"
+          >
+            <div className="border-b border-gold-400/30 pb-3 mb-6 flex items-center justify-between">
+              <div>
+                <span className="text-xs text-gold-400 tracking-wider font-semibold uppercase">
+                  SECTION {activeSectionIndex + 1} OF {selectedTemplate.sections.length}
+                </span>
+                <h2 className="text-xl sm:text-2xl font-serif font-bold text-white mt-0.5">
+                  {currentSection.title}
+                </h2>
+              </div>
+              <button
+                onClick={generateContract}
+                className="btn-primary text-xs py-2 px-3.5 hidden sm:inline-flex"
+              >
+                ⚡ 立即生成契约
+              </button>
+            </div>
+
+            {/* Current Section Fields */}
+            <div className="space-y-5">
+              {currentSection.fields.map((field, fieldIndex) => {
+                const fieldKey = `section_${activeSectionIndex}_${field.label}`
+                const fieldValue = formData[fieldKey] !== undefined ? formData[fieldKey] : (field.value || '')
+
+                return (
+                  <div key={fieldIndex} className="form-group">
                     <label className="form-label">
-                      {field.label}
-                      {field.required && (
-                        <span className="ml-2 text-gold-400">*</span>
+                      <span>
+                        {field.label}
+                        {field.required && <span className="text-gold-400 ml-1.5">*</span>}
+                      </span>
+                      {field.type === 'textarea' && (
+                        <span className="text-[11px] text-gray-500 font-normal">可直接微调修改条款</span>
                       )}
                     </label>
-                    
+
                     {field.type === 'textarea' ? (
                       <textarea
-                        value={formData[`section_${sectionIndex}_${field.label}`] || ''}
-                        onChange={(e) => handleFieldChange(sectionIndex, field.label, e.target.value)}
+                        value={fieldValue}
+                        onChange={(e) => handleFieldChange(activeSectionIndex, field.label, e.target.value)}
                         className="form-textarea"
                         placeholder={field.placeholder}
-                        rows={field.required ? 6 : 4}
+                        rows={5}
                       />
+                    ) : field.type === 'select' ? (
+                      <select
+                        value={fieldValue}
+                        onChange={(e) => handleFieldChange(activeSectionIndex, field.label, e.target.value)}
+                        className="form-input"
+                      >
+                        {field.options?.map((opt, oIdx) => (
+                          <option key={oIdx} value={opt} className="bg-dark-900 text-white">
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
                     ) : (
                       <input
                         type={field.type}
-                        value={formData[`section_${sectionIndex}_${field.label}`] || ''}
-                        onChange={(e) => handleFieldChange(sectionIndex, field.label, e.target.value)}
+                        value={fieldValue}
+                        onChange={(e) => handleFieldChange(activeSectionIndex, field.label, e.target.value)}
                         className="form-input"
                         placeholder={field.placeholder}
                         required={field.required}
                       />
                     )}
-                  </motion.div>
-                ))}
-              </div>
+                  </div>
+                )
+              })}
+            </div>
 
-              {/* Section Navigation */}
-              {sectionIndex < selectedTemplate.sections.length - 1 && (
-                <div className="mt-8 flex justify-between">
+            {/* Stepper Navigation Buttons */}
+            <div className="pt-6 border-t border-gray-700/60 flex items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveSectionIndex(prev => Math.max(0, prev - 1))}
+                disabled={activeSectionIndex === 0}
+                className="btn-secondary text-xs sm:text-sm px-4 py-2.5"
+              >
+                ← 上一节
+              </button>
+
+              <div className="flex items-center gap-2">
+                {!isLastSection ? (
                   <button
-                    onClick={() => setActiveSectionIndex(prev => Math.max(0, prev - 1))}
-                    disabled={activeSectionIndex === 0}
-                    className="btn-secondary disabled:opacity-50"
-                  >
-                    ← 上一节
-                  </button>
-                  <button
-                    onClick={() => setActiveSectionIndex(prev => prev + 1)}
-                    className="btn-primary"
+                    type="button"
+                    onClick={() => setActiveSectionIndex(prev => Math.min(selectedTemplate.sections.length - 1, prev + 1))}
+                    className="btn-primary text-xs sm:text-sm px-5 py-2.5"
                   >
                     下一节 →
                   </button>
-                </div>
-              )}
-            </motion.div>
-          ))}
+                ) : null}
 
-          {/* Generate Button */}
-          <div className="mt-12 text-center">
-            <AnimatePresence mode="wait">
-              {activeSectionIndex === selectedTemplate.sections.length - 1 ? (
-                <motion.button
-                  key="generate"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
+                <button
+                  type="button"
                   onClick={generateContract}
                   disabled={isGenerating}
-                  className="btn-primary text-lg px-12 py-4"
+                  className="btn-primary text-xs sm:text-sm px-6 py-2.5 shadow-lg shadow-gold-400/25"
                 >
-                  {isGenerating ? (
-                    <span className="flex items-center gap-3">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      正在生成契约...
-                    </span>
-                  ) : (
-                    '📜 生成我的专属契约'
-                  )}
-                </motion.button>
-              ) : null}
+                  {isGenerating ? '⏳ 生成中...' : '📜 生成契约'}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          /* SHOW ALL SECTIONS VIEW */
+          <div className="space-y-10">
+            {selectedTemplate.sections.map((section, sIdx) => (
+              <div key={sIdx} className="border-b border-gray-700/60 pb-8 last:border-b-0 last:pb-0">
+                <div className="border-b border-gold-400/30 pb-2 mb-5">
+                  <h3 className="text-xl font-serif font-bold text-gold-400">
+                    {sIdx + 1}. {section.title}
+                  </h3>
+                </div>
 
-              {activeSectionIndex > 0 && (
-                <motion.button
-                  key="back"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  onClick={() => setActiveSectionIndex(prev => Math.max(0, prev - 1))}
-                  className="btn-secondary"
-                >
-                  ← 返回上一节
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </div>
+                <div className="space-y-4">
+                  {section.fields.map((field, fIdx) => {
+                    const fieldKey = `section_${sIdx}_${field.label}`
+                    const fieldValue = formData[fieldKey] !== undefined ? formData[fieldKey] : (field.value || '')
 
-          {/* Footer */}
-          <div className="mt-12 pt-8 border-t border-gold-400/30 text-center">
-            <p className="text-gray-500 text-sm">
-              所有数据仅保存在您的本地浏览器中，不会上传到任何服务器
-            </p>
+                    return (
+                      <div key={fIdx} className="form-group">
+                        <label className="form-label">
+                          <span>
+                            {field.label}
+                            {field.required && <span className="text-gold-400 ml-1.5">*</span>}
+                          </span>
+                        </label>
+
+                        {field.type === 'textarea' ? (
+                          <textarea
+                            value={fieldValue}
+                            onChange={(e) => handleFieldChange(sIdx, field.label, e.target.value)}
+                            className="form-textarea"
+                            placeholder={field.placeholder}
+                            rows={4}
+                          />
+                        ) : field.type === 'select' ? (
+                          <select
+                            value={fieldValue}
+                            onChange={(e) => handleFieldChange(sIdx, field.label, e.target.value)}
+                            className="form-input"
+                          >
+                            {field.options?.map((opt, oIdx) => (
+                              <option key={oIdx} value={opt} className="bg-dark-900 text-white">
+                                {opt}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={field.type}
+                            value={fieldValue}
+                            onChange={(e) => handleFieldChange(sIdx, field.label, e.target.value)}
+                            className="form-input"
+                            placeholder={field.placeholder}
+                          />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+
+            <div className="pt-6 border-t border-gold-400/30 text-center">
+              <button
+                type="button"
+                onClick={generateContract}
+                disabled={isGenerating}
+                className="btn-primary text-base sm:text-lg px-8 py-3.5 shadow-xl shadow-gold-400/20"
+              >
+                {isGenerating ? '⏳ 正在排版生成...' : '📜 生成我的专属契约 (完成)'}
+              </button>
+            </div>
           </div>
-        </motion.div>
+        )}
       </div>
     </div>
   )

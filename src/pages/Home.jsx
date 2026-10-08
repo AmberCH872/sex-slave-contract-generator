@@ -1,224 +1,198 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { templates } from '../data/templates'
 
 const features = [
   {
     icon: '📜',
-    title: '专业模板库',
-    description: '提供多种 BDSM 协议模板，包括主奴契约、宠玩协议、24/7 权力交换等',
-    color: 'from-gold-500 to-yellow-600'
+    title: '专业协议模板',
+    description: '涵盖经典主奴、宠玩 (Pet Play)、24/7 全权交换、哥罗哲学及女上位等多种动态',
+    color: 'from-amber-500 to-yellow-600'
   },
   {
-    icon: '✏️',
-    title: '完全自定义',
-    description: '编辑每一个字，添加专属条款，打造独一无二的契约文本',
+    icon: '✍️',
+    title: '完全个性化微调',
+    description: '支持分步填写与全文实时编辑，定制每一条专属服从规则与日常仪式',
     color: 'from-purple-500 to-pink-600'
   },
   {
-    icon: '🎨',
-    title: '精美排版',
-    description: '优雅的古典风格设计，支持打印和 PDF 导出',
+    icon: '🖨️',
+    title: '古典羊皮纸排版',
+    description: '典雅奢华的古典装帧美学，支持一键打印、导出高清 PDF 与复制全文',
     color: 'from-blue-500 to-cyan-600'
   },
   {
     icon: '🔒',
-    title: '隐私保护',
-    description: '所有数据本地处理，不上传云端，完全私密安全',
-    color: 'from-green-500 to-emerald-600'
+    title: '100% 本地隐私安全',
+    description: '所有文本与草稿严格储存在您的本地浏览器中，绝不上载任何云端服务器',
+    color: 'from-emerald-500 to-teal-600'
   }
-]
-
-const dynamics = [
-  { name: '基本主奴契约', path: '/generator?type=basic-ds' },
-  { name: '宠玩协议 (Pet Play)', path: '/generator?type=pet-play' },
-  { name: '24/7 全权交换', path: '/generator?type=tpe' },
-  { name: '哥罗奴隶契约', path: '/generator?type=gorean-slave' },
-  { name: '女上位协议 (Femdom)', path: '/generator?type=femdom' },
-  { name: '宠物饲养协议', path: '/generator?type=pet-play-2' }
 ]
 
 export default function Home() {
   return (
-    <div className="min-h-screen pt-20">
+    <div className="space-y-12 sm:space-y-20">
       {/* Hero Section */}
-      <section className="container-custom py-24 md:py-32 text-center">
+      <section className="container-custom py-8 sm:py-16 md:py-20 text-center">
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto"
+          transition={{ duration: 0.6 }}
+          className="max-w-3xl mx-auto space-y-5 sm:space-y-7"
         >
-          <div className="inline-block mb-6 px-6 py-2 rounded-full bg-gold-400/20 border border-gold-400/30">
-            <span className="text-gold-400 font-semibold tracking-wider text-sm uppercase">
-              专业 BDSM 协议生成工具
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-400/15 border border-gold-400/30">
+            <span className="text-gold-400 text-xs sm:text-sm font-semibold tracking-wider uppercase">
+              ✨ 权威 · 臣服 · 契约精神
             </span>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-gold-400 via-yellow-500 to-gold-400 
-                       bg-clip-text text-transparent">
-              性奴认主协议
+          {/* Title */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-display font-bold leading-tight tracking-tight">
+            <span className="bg-gradient-to-r from-gold-400 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+              性奴认主协议生成器
             </span>
             <br />
-            <span className="text-gray-300">生成器</span>
+            <span className="text-xl sm:text-3xl md:text-4xl text-gray-300 font-serif font-normal mt-2 block">
+              BDSM Contract & Agreement Generator
+            </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-            创建专业、优雅且完全个性化的 BDSM 契约文档。从精美模板开始，编辑每一个细节，
-            生成可打印的正式协议。
+          {/* Subtitle */}
+          <p className="text-sm sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            在理智、知情自愿与相互尊重的前提下，构建神圣而严谨的权力交换盟约。
+            提供完备的条款范式，支持自由微调与古典羊皮纸版式导出。
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link to="/generator" className="btn-primary">
-              立即开始创建
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-2">
+            <Link 
+              to="/generator" 
+              className="btn-primary w-full sm:w-auto text-base sm:text-lg px-8 py-3.5 shadow-xl shadow-gold-400/20"
+            >
+              ✍️ 立即开始起草契约
             </Link>
-            <a href="#features" className="btn-secondary">
-              了解更多
+            <a 
+              href="#templates-section" 
+              className="btn-secondary w-full sm:w-auto text-base px-6 py-3"
+            >
+              📜 浏览契约模板库
             </a>
           </div>
         </motion.div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="container-custom py-20">
-        <div className="text-center mb-16">
-          <h2 className="section-title">核心功能</h2>
-          <p className="text-gray-400 text-lg mt-4 max-w-2xl mx-auto">
-            专业的工具，为您的 BDSM 关系提供完美的契约保障
+      {/* Templates Section */}
+      <section id="templates-section" className="container-custom py-6 sm:py-10">
+        <div className="text-center mb-8 sm:mb-12">
+          <span className="text-xs sm:text-sm text-gold-400 font-semibold uppercase tracking-widest block mb-2">
+            PRE-CONFIGURED TEMPLATES
+          </span>
+          <h2 className="section-title">
+            专属契约模板库
+          </h2>
+          <p className="text-gray-400 text-xs sm:text-base max-w-xl mx-auto">
+            选择最贴合您与伴侣关系的动态范式，系统已内置预设条款，随时可按需修改
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {templates.map((tpl, index) => (
             <motion.div
-              key={index}
+              key={tpl.id}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="card"
-            >
-              <div className={`w-16 h-16 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center text-3xl mb-4`}>
-                {feature.icon}
-              </div>
-              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-              <p className="text-gray-400 leading-relaxed">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Template Section */}
-      <section className="container-custom py-20">
-        <div className="text-center mb-16">
-          <h2 className="section-title">协议模板</h2>
-          <p className="text-gray-400 text-lg mt-4 max-w-2xl mx-auto">
-            选择适合您关系的动态类型，每个模板都经过精心设计
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dynamics.map((dynamic, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.4, delay: index * 0.08 }}
               viewport={{ once: true }}
             >
               <Link
-                to={dynamic.path}
-                className="card group block h-full"
+                to={`/generator?type=${tpl.id}`}
+                className="card group flex flex-col justify-between h-full hover:scale-[1.02] border-gray-700/80 hover:border-gold-400/60 p-5 sm:p-6"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`text-2xl ${index === 0 ? 'text-gold-400' : 'text-gray-400'}`}>
-                    {index === 0 ? '👑' : index === 1 ? '🐕' : index === 2 ? '⚡' : 
-                     index === 3 ? '📜' : index === 4 ? '💅' : '🏠'}
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-gold-400/20 flex items-center justify-center group-hover:bg-gold-400/30 transition-all">
-                    <svg className="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
+                <div>
+                  <div className="flex items-center justify-between mb-3.5">
+                    <span className="text-3xl sm:text-4xl p-2 rounded-xl bg-gold-400/10 border border-gold-400/20 group-hover:scale-110 transition-transform">
+                      {tpl.icon}
+                    </span>
+                    <span className="badge text-[11px]">
+                      {tpl.subtitle || '推荐范本'}
+                    </span>
                   </div>
+
+                  <h3 className="text-lg sm:text-xl font-serif font-bold text-white group-hover:text-gold-400 transition-colors mb-2">
+                    {tpl.name}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-gray-400 leading-relaxed mb-4">
+                    {tpl.description}
+                  </p>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 group-hover:text-gold-400 transition-colors">
-                  {dynamic.name}
-                </h3>
-                <p className="text-gray-500 text-sm">
-                  点击开始创建您的专属协议
-                </p>
+
+                <div className="pt-3 border-t border-gray-700/60 flex items-center justify-between text-xs sm:text-sm text-gold-400 font-medium">
+                  <span>包含 {tpl.sections.length} 个核心规约章节</span>
+                  <span className="group-hover:translate-x-1 transition-transform">起草 →</span>
+                </div>
               </Link>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="container-custom py-20">
-        <div className="text-center mb-16">
-          <h2 className="section-title">如何使用</h2>
-          <p className="text-gray-400 text-lg mt-4 max-w-2xl mx-auto">
-            三步创建您的完美契约
+      {/* Core Features Section */}
+      <section className="container-custom py-6 sm:py-10">
+        <div className="text-center mb-8 sm:mb-12">
+          <span className="text-xs sm:text-sm text-gold-400 font-semibold uppercase tracking-widest block mb-2">
+            WHY THIS TOOL
+          </span>
+          <h2 className="section-title">
+            专为亲密探索者打造
+          </h2>
+          <p className="text-gray-400 text-xs sm:text-base max-w-xl mx-auto">
+            兼顾仪式感、严谨性与现代技术体验的专业协议定制方案
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { step: '1', title: '选择模板', desc: '从专业模板库中选择适合您关系的协议类型' },
-            { step: '2', title: '自定义编辑', desc: '修改每一个细节，添加专属条款和个性化内容' },
-            { step: '3', title: '预览导出', desc: '查看最终效果，打印或下载 PDF 版本' }
-          ].map((item, index) => (
-            <motion.div
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {features.map((feature, index) => (
+            <div
               key={index}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              viewport={{ once: true }}
-              className="text-center"
+              className="card p-5 sm:p-6 flex flex-col justify-between"
             >
-              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gold-500 to-yellow-600 
-                           flex items-center justify-center text-3xl font-bold shadow-lg">
-                {item.step}
+              <div>
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center text-2xl mb-4 shadow-md`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
-              <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
-              <p className="text-gray-400 leading-relaxed">{item.desc}</p>
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="container-custom py-20">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="bg-gradient-to-r from-dark-800 to-dark-700 rounded-2xl p-12 text-center border border-gold-400/30"
-        >
-          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
-            准备好创建您的契约了吗？
-          </h2>
-          <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-            专业的工具，优雅的设计，完全私密。立即开始您的认主之旅。
-          </p>
-          <Link to="/generator" className="btn-primary inline-block">
-            开始创建协议
-          </Link>
-        </motion.div>
+      {/* Bottom CTA Banner */}
+      <section className="container-custom pb-8">
+        <div className="card text-center p-6 sm:p-12 border-gold-400/40 relative overflow-hidden bg-gradient-to-b from-dark-800/90 to-dark-900/90">
+          <div className="max-w-xl mx-auto space-y-4">
+            <span className="text-3xl">👑</span>
+            <h2 className="text-xl sm:text-3xl font-display font-bold text-white">
+              准备好确立您的专属契约了吗？
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
+              只需选择一个契约模板，填入称谓并根据双方沟通微调条款，3分钟即可生成精美可打印的正式协议文档。
+            </p>
+            <div className="pt-2">
+              <Link to="/generator" className="btn-primary text-base px-8 py-3">
+                立即前往契约生成器 →
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
-
-      {/* Footer */}
-      <footer className="container-custom py-12 border-t border-gold-400/20 text-center">
-        <p className="text-gray-500 mb-2">
-          © 2026 BDSM Contract Generator | All Rights Reserved
-        </p>
-        <p className="text-gray-600 text-sm">
-          Designed for the modern kink community
-        </p>
-      </footer>
     </div>
   )
 }
