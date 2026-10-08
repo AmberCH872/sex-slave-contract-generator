@@ -2,8 +2,7 @@
 node_modules/
 
 # Build output
-dist/
-build/
+# dist/  # Will be added for GitHub Pages
 
 # IDE
 .vscode/
